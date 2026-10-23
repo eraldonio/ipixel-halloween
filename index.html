@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎃 Dual iPixel Mega Halloween FX Suite</title>
+  <style>
+    :root {
+      --bg: #07090c;
+      --card: #12151c;
+      --card-border: #1f242e;
+      --orange: #ff6a00;
+      --purple: #9b51e0;
+      --green: #00e676;
+      --red: #ff3344;
+      --cyan: #00e5ff;
+      --text: #f0f3f6;
+      --muted: #8b949e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      min-height: 100vh;
+    }
+    header {
+      text-align: center;
+    }
+    h1 {
+      margin: 0 0 6px 0;
+      color: var(--orange);
+      font-size: 1.9rem;
+      letter-spacing: 0.5px;
+      text-shadow: 0 0 18px rgba(255, 106, 0, 0.45);
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(255, 106, 0, 0.2);
+      color: var(--orange);
+      border-radius: 12px;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      max-width: 820px;
+      width: 100%;
+    }
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      width: 100%;
+    }
+    button, select, input[type="range"] {
+      background: #1b1f28;
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    button:hover:not(:disabled) {
+      background: #252b37;
+      border-color: var(--orange);
+      transform: translateY(-1px);
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    button.primary {
+      background: linear-gradient(135deg, #ff6a00, #ff8c00);
+      color: #050505;
+      border: none;
+      box-shadow: 0 2px 10px rgba(255, 106, 0, 0.35);
+    }
+    button.primary:hover:not(:disabled) {
+      background: linear-gradient(135deg, #ff7a1a, #ffa033);
+    }
+    button.connected {
+      background: rgba(0, 230, 118, 0.15);
+      color: var(--green);
+      border: 1px solid rgba(0, 230, 118, 0.4);
+    }
+    button.danger {
+      background: rgba(255, 51, 68, 0.15);
+      color: var(--red);
+      border: 1px solid rgba(255, 51, 68, 0.4);
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .field label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    #preview-container {
+      margin-top: 4px;
+    }
+    .status-bar {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+      padding: 6px 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 6px;
+      max-width: 820px;
+      width: 100%;
+    }
+    .status-bar.highlight {
+      color: var(--orange);
+      border: 1px solid rgba(255, 106, 0, 0.3);
+    }
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+    }
+    .slider-row span {
+      font-size: 13px;
+      color: var(--muted);
+      min-width: 32px;
+    }
+    .category-chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+      margin-bottom: 4px;
+    }
+    .chip {
+      padding: 4px 10px;
+      font-size: 12px;
+      border-radius: 16px;
+      background: #191d26;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      color: var(--muted);
+    }
+    .chip.active {
+      background: rgba(255, 106, 0, 0.2);
+      border-color: var(--orange);
+      color: var(--orange);
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🎃 Dual iPixel Mega Halloween FX <span class="badge">17 Curated FX</span></h1>
+    <div class="subtitle">Unified 64×32 Dual-Matrix BLE Controller for iPixel Displays</div>
+  </header>
+
+  <div id="status-bar" class="status-bar">Ready. Connect Display 0 (Left) and Display 1 (Right) to begin streaming.</div>
+
+  <!-- Hardware Connection Panel -->
+  <div class="panel">
+    <button id="btn-conn-0" class="primary">🔗 Connect Left Display (Slot 0)</button>
+    <button id="btn-conn-1" class="primary">🔗 Connect Right Display (Slot 1)</button>
+    <button id="btn-swap">⇄ Swap Left/Right</button>
+  </div>
+
+  <!-- Category Filter & Animation Picker -->
+  <div class="panel">
+    <div class="category-chips" id="cat-chips">
+      <div class="chip active" data-cat="All">All (17)</div>
+      <div class="chip" data-cat="Monsters">Monsters (7)</div>
+      <div class="chip" data-cat="Creatures">Creatures (5)</div>
+      <div class="chip" data-cat="Atmosphere">Atmosphere (2)</div>
+      <div class="chip" data-cat="Spooky FX">✨ CipriEnt FX (2)</div>
+      <div class="chip" data-cat="Text">Text (1)</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="controls-grid">
+      <div class="field">
+        <label for="fx-select">Choose Animation</label>
+        <select id="fx-select" style="font-size: 14px;"></select>
+      </div>
+
+      <div class="field">
+        <label>Playback Controls</label>
+        <div style="display: flex; gap: 8px;">
+          <button id="btn-play" class="primary" style="flex: 1.2;">▶ Start</button>
+          <button id="btn-stop" class="danger" style="flex: 1;">⏹ Stop</button>
+          <button id="btn-prev" title="Previous scene">⏮</button>
+          <button id="btn-next" title="Next scene">⏭</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="slider-row" style="margin-top: 10px;">
+      <span style="min-width: 90px;">Brightness:</span>
+      <input type="range" id="brightness-slider" min="5" max="100" value="70" style="flex: 1;" />
+      <span id="brightness-val">70%</span>
+      <span style="min-width: 80px; margin-left: 16px;">Speed:</span>
+      <input type="range" id="speed-slider" min="60" max="250" value="120" style="flex: 1;" />
+      <span id="speed-val">120ms</span>
+    </div>
+  </div>
+
+  <!-- Visual Twin Simulator -->
+  <div id="preview-container"></div>
+
+  <!-- Load Modules -->
+  <script type="module">
+    import {
+      IPixelDevice,
+      VirtualDisplay,
+      IPixelPreview
+    } from './lib/index.js';
+
+    import { FX_LIST, SCENE_MAP } from './fx-library.js';
+
+    const statusEl = document.getElementById('status-bar');
+    const btnConn0 = document.getElementById('btn-conn-0');
+    const btnConn1 = document.getElementById('btn-conn-1');
+    const btnSwap = document.getElementById('btn-swap');
+    const btnPlay = document.getElementById('btn-play');
+    const btnStop = document.getElementById('btn-stop');
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+    const fxSelect = document.getElementById('fx-select');
+    const brightnessSlider = document.getElementById('brightness-slider');
+    const brightnessVal = document.getElementById('brightness-val');
+    const speedSlider = document.getElementById('speed-slider');
+    const speedVal = document.getElementById('speed-val');
+    const catChips = document.getElementById('cat-chips');
+
+    // 1. Populate FX Select Dropdown
+    function populateDropdown(filterCat = 'All') {
+      fxSelect.innerHTML = '';
+
+      // Auto cycle option
+      const autoOpt = document.createElement('option');
+      autoOpt.value = 'auto';
+      autoOpt.textContent = '🔀 Auto-Playlist (Cycles Every 8s)';
+      fxSelect.appendChild(autoOpt);
+
+      FX_LIST.forEach(fx => {
+        if (filterCat === 'All' || fx.cat === filterCat) {
+          const opt = document.createElement('option');
+          opt.value = fx.id;
+          opt.textContent = fx.name;
+          fxSelect.appendChild(opt);
+        }
+      });
+    }
+    populateDropdown('All');
+
+    catChips.addEventListener('click', (e) => {
+      const chip = e.target.closest('.chip');
+      if (!chip) return;
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      const cat = chip.dataset.cat;
+      populateDropdown(cat);
+      drawCurrentScene();
+    });
+
+    // 2. Virtual Display Setup (Unified 64x32 Canvas)
+    const virtual = new VirtualDisplay({ cols: 2, rows: 1 });
+    const preview = new IPixelPreview(document.getElementById('preview-container'), {
+      cols: 2,
+      rows: 1,
+      labelPrefix: 'Display',
+      onSwap: () => virtual.swapSlots(0, 1)
+    });
+
+    const devices = [null, null];
+    let isRunning = false;
+    let animTimer = null;
+    let tick = 0;
+    let syncing = false;
+    let intervalMs = 120;
+
+    function setStatus(msg, isHighlight = false) {
+      statusEl.textContent = msg;
+      statusEl.className = isHighlight ? 'status-bar highlight' : 'status-bar';
+    }
+
+    async function handleConnect(slotIndex, btn) {
+      try {
+        btn.disabled = true;
+        setStatus(`Opening Bluetooth device picker for slot ${slotIndex}...`);
+        const dev = new IPixelDevice();
+        await dev.connect();
+
+        devices[slotIndex] = dev;
+        virtual.registerDevice(slotIndex, dev);
+
+        btn.disabled = false;
+        btn.className = 'connected';
+        btn.textContent = `✓ Display ${slotIndex} Connected`;
+        setStatus(`Display ${slotIndex} connected successfully!`, true);
+
+        drawCurrentScene();
+        virtual.sync();
+      } catch (err) {
+        console.error(err);
+        btn.disabled = false;
+        btn.textContent = `Retry Connect (${slotIndex})`;
+        setStatus(`Connection failed: ${err.message || err}`);
+      }
+    }
+
+    btnConn0.addEventListener('click', () => handleConnect(0, btnConn0));
+    btnConn1.addEventListener('click', () => handleConnect(1, btnConn1));
+
+    btnSwap.addEventListener('click', () => {
+      preview.toggleSwap();
+      virtual.sync();
+      setStatus('Swapped Left and Right display mapping.');
+    });
+
+    brightnessSlider.addEventListener('input', (e) => {
+      brightnessVal.textContent = `${e.target.value}%`;
+    });
+    brightnessSlider.addEventListener('change', async (e) => {
+      const val = parseInt(e.target.value, 10);
+      for (const dev of devices) {
+        if (dev && dev.connected) {
+          try { await dev.setBrightness(val); } catch (err) { console.warn(err); }
+        }
+      }
+      setStatus(`Brightness set to ${val}%`);
+    });
+
+    speedSlider.addEventListener('input', (e) => {
+      intervalMs = parseInt(e.target.value, 10);
+      speedVal.textContent = `${intervalMs}ms`;
+    });
+
+    btnPrev.addEventListener('click', () => {
+      if (fxSelect.selectedIndex > 0) {
+        fxSelect.selectedIndex--;
+        drawCurrentScene();
+      }
+    });
+    btnNext.addEventListener('click', () => {
+      if (fxSelect.selectedIndex < fxSelect.options.length - 1) {
+        fxSelect.selectedIndex++;
+        drawCurrentScene();
+      }
+    });
+
+    // 3. Draw & Scene Runner
+    function drawCurrentScene() {
+      let currentId = fxSelect.value;
+      if (currentId === 'auto') {
+        const idx = Math.floor(tick / 55) % FX_LIST.length;
+        currentId = FX_LIST[idx].id;
+      }
+
+      const renderFn = SCENE_MAP[currentId] || SCENE_MAP['eyes'];
+      const ctx = virtual.getCanvasContext();
+      renderFn(ctx, tick);
+
+      preview.update(virtual.canvas);
+    }
+
+    // 4. Animation Loop
+    async function loop() {
+      if (!isRunning) return;
+
+      drawCurrentScene();
+
+      // Only push over BLE if previous frame has resolved to prevent GATT collisions
+      if (!syncing && (devices[0]?.connected || devices[1]?.connected)) {
+        syncing = true;
+        virtual.sync().finally(() => {
+          syncing = false;
+        });
+      }
+
+      tick++;
+      animTimer = setTimeout(loop, intervalMs);
+    }
+
+    btnPlay.addEventListener('click', () => {
+      if (isRunning) return;
+      isRunning = true;
+      setStatus('Animation running! Streaming to displays & preview twin.', true);
+      loop();
+    });
+
+    btnStop.addEventListener('click', () => {
+      isRunning = false;
+      if (animTimer) clearTimeout(animTimer);
+      setStatus('Animation paused.');
+    });
+
+    fxSelect.addEventListener('change', () => {
+      drawCurrentScene();
+    });
+    // Auto-start animation loop on page load so simulator is immediately animated
+    isRunning = true;
+    loop();
+  </script>
+</body>
+</html>
